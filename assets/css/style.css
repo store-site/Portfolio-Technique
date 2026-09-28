@@ -126,3 +126,26 @@ section.block{padding:96px 0}
 .skills h3{font-size:1.4rem;margin-bottom:10px}
 .skills p{font-size:.92rem;color:var(--muted)}
 @media(max-width:860px){.skills{grid-template-columns:1fr}}
+
+/* ============ HERO AVEC PHOTO ============ */
+.hero{padding:96px 0 90px}
+.hero-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:72px;align-items:center}
+.hero .lead + .lead{margin-top:14px;color:rgba(246,243,236,.6);font-size:.98rem}
+.portrait{position:relative;aspect-ratio:4/5;background:var(--navy-2);max-width:380px;justify-self:end;width:100%}
+.portrait::before{content:"";position:absolute;inset:0;transform:translate(16px,16px);border:1px solid var(--brass)}
+.portrait img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;object-position:center top}
+
+/* ============ 4 ENTRÉES ============ */
+.doors{grid-template-columns:repeat(4,1fr)}
+.door h3{font-size:1.7rem}
+
+@media(max-width:1000px){
+  .doors{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:860px){
+  .hero-grid{grid-template-columns:1fr;gap:56px}
+  .portrait{justify-self:start;max-width:300px}
+}
+@media(max-width:600px){
+  .doors{grid-template-columns:1fr}
+}
