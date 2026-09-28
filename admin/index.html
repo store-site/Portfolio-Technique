@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Administration — Stella Yathe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .hidden{display:none !important}
+    .panel{background:var(--paper);border:1px solid var(--line);padding:36px 34px;margin-bottom:40px}
+    .panel h2{font-size:1.8rem;margin-bottom:24px}
+    .field{margin-bottom:22px}
+    .field label{display:block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin-bottom:8px}
+    .field input[type=text],.field input[type=email],.field input[type=password],.field input[type=date],.field select,.field textarea{
+      width:100%;padding:13px 14px;border:1px solid var(--line);background:var(--ivory);font-family:var(--sans);font-size:.95rem;color:var(--ink);border-radius:0}
+    .field textarea{resize:vertical;line-height:1.55}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--brass)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .hint{font-size:.8rem;color:var(--muted);margin-top:8px}
+    .check{display:flex;gap:10px;align-items:center;font-size:.95rem;margin-bottom:26px}
+    .btns{display:flex;gap:14px;flex-wrap:wrap}
+    .msg{margin-bottom:22px;padding:12px 16px;font-size:.9rem;border-left:2px solid var(--brass);background:var(--ivory)}
+    .msg.err{border-color:#a33;color:#a33}
+    .list-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+    .item{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:20px 4px;border-bottom:1px solid var(--line)}
+    .item:first-child{border-top:1px solid var(--line)}
+    .item h3{font-size:1.35rem;margin-bottom:4px}
+    .item .sub{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .badge{display:inline-block;margin-left:10px;padding:3px 10px;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted)}
+    .badge.pub{background:var(--navy);color:var(--ivory);border-color:var(--navy)}
+    .actions-mini{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .mini{padding:8px 14px;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);background:transparent;cursor:pointer;color:var(--navy);font-family:var(--sans);transition:.2s}
+    .mini:hover{background:var(--navy);color:var(--ivory);border-color:var(--navy)}
+    .mini.del:hover{background:#a33;border-color:#a33}
+    .top-right{display:flex;gap:18px;align-items:center}
+    .top-right a,.top-right button{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(246,243,236,.75);background:none;border:none;cursor:pointer;font-family:var(--sans)}
+    .top-right a:hover,.top-right button:hover{color:var(--brass)}
+    @media(max-width:700px){.row{grid-template-columns:1fr}.item{grid-template-columns:1fr}.actions-mini{justify-content:flex-start}.panel{padding:26px 20px}}
+  </style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="wrap">
+      <a href="../index.html" class="brand">Stella <span>YATHE</span></a>
+      <div class="top-right">
+        <a href="../travaux/index.html">Voir le site</a>
+        <button id="logout" class="hidden">Se déconnecter</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="page-head">
+    <div class="wrap">
+      <span class="eyebrow">Administration</span>
+      <h1>Publications</h1>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:64px">
+    <div class="wrap" style="max-width:860px">
+
+      <!-- CONNEXION -->
+      <div id="login-view" class="panel">
+        <h2>Connexion</h2>
+        <div id="login-msg" class="msg err hidden"></div>
+        <form id="login-form">
+          <div class="field"><label for="email">E-mail</label><input type="email" id="email" autocomplete="username" required></div>
+          <div class="field"><label for="password">Mot de passe</label><input type="password" id="password" autocomplete="current-password" required></div>
+          <button class="btn btn-solid" type="submit">Se connecter</button>
+        </form>
+      </div>
+
+      <!-- PANNEAU -->
+      <div id="admin-view" class="hidden">
+
+        <div id="msg" class="msg hidden"></div>
+
+        <!-- FORMULAIRE -->
+        <div class="panel" id="form-panel">
+          <h2 id="form-title">Nouvelle publication</h2>
+          <form id="work-form">
+            <div class="field">
+              <label for="f-title">Titre</label>
+              <input type="text" id="f-title" maxlength="140" required>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label for="f-cat">Catégorie</label>
+                <select id="f-cat" required>
+                  <option value="">Choisir…</option>
+                  <option>Analyse d'entreprise</option>
+                  <option>Concept financier</option>
+                  <option>Rapport annuel</option>
+                  <option>Transaction M&amp;A</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f-date">Date</label>
+                <input type="date" id="f-date" required>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f-excerpt">Résumé (affiché sur la carte)</label>
+              <textarea id="f-excerpt" rows="3" maxlength="240" required></textarea>
+              <div class="hint"><span id="count">0</span> / 240 caractères</div>
+            </div>
+
+            <div class="field">
+              <label for="f-content">Contenu</label>
+              <textarea id="f-content" rows="18"></textarea>
+              <div class="hint">
+                <code>## Titre</code> · <code>### Sous-titre</code> · <code>- puce</code> · <code>&gt; citation</code> · <code>**gras**</code> · <code>*italique*</code> · <code>[texte](https://…)</code> · <code>![légende](../travaux/img/schema.png)</code><br>
+                Une ligne vide sépare deux paragraphes.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f-pdf">Lien du PDF (facultatif)</label>
+              <input type="text" id="f-pdf" placeholder="../travaux/pdf/eiffage.pdf">
+              <div class="hint">Dépose d'abord le PDF dans le dossier <code>travaux/pdf/</code> du dépôt GitHub.</div>
+            </div>
+
+            <label class="check"><input type="checkbox" id="f-pub"> Publié (visible par tout le monde sur le site)</label>
+
+            <div class="btns">
+              <button class="btn btn-solid" type="submit" id="save">Enregistrer</button>
+              <button class="btn btn-dark" type="button" id="reset">Annuler / Nouveau</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- LISTE -->
+        <div class="list-head">
+          <h2 style="font-size:1.8rem">Mes publications</h2>
+          <span class="sub" id="total" style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)"></span>
+        </div>
+        <div id="list"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>© 2026 Stella Yathe</span>
+      <span>Administration</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { auth, db } from "../assets/js/firebase-config.js";
+    import { onAuthStateChanged, signInWithEmailAndPassword, signOut }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, getDocs, addDoc, setDoc, doc, deleteDoc, Timestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const ADMIN_EMAIL = "stellayathe@gmail.com";
+    const $ = (id) => document.getElementById(id);
+    const esc = (s = "") => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+    let items = [];
+    let editId = null;
+
+    /* ---------- Utilitaires ---------- */
+    const toDate = (v) => v?.toDate ? v.toDate() : (v ? new Date(v) : null);
+    const pad = (n) => String(n).padStart(2, "0");
+    const toInput = (d) => d && !isNaN(d) ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : "";
+    const fmt = (d) => d && !isNaN(d) ? d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "sans date";
+
+    function flash(text, isErr = false) {
+      const m = $("msg");
+      m.textContent = text;
+      m.className = "msg" + (isErr ? " err" : "");
+      m.classList.remove("hidden");
+      clearTimeout(flash.t);
+      flash.t = setTimeout(() => m.classList.add("hidden"), 5000);
+    }
+
+    /* ---------- Connexion ---------- */
+    $("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const box = $("login-msg");
+      box.classList.add("hidden");
+      try {
+        await signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value);
+      } catch (err) {
+        const map = {
+          "auth/invalid-credential": "E-mail ou mot de passe incorrect.",
+          "auth/wrong-password": "E-mail ou mot de passe incorrect.",
+          "auth/user-not-found": "E-mail ou mot de passe incorrect.",
+          "auth/too-many-requests": "Trop de tentatives. Réessaie dans quelques minutes.",
+          "auth/unauthorized-domain": "Domaine non autorisé : ajoute store-site.github.io dans Firebase → Authentication → Paramètres → Domaines autorisés."
+        };
+        box.textContent = map[err.code] || ("Erreur : " + err.code);
+        box.classList.remove("hidden");
+      }
+    });
+
+    $("logout").addEventListener("click", () => signOut(auth));
+
+    onAuthStateChanged(auth, (user) => {
+      const ok = user && user.email === ADMIN_EMAIL;
+      if (user && !ok) {
+        signOut(auth);
+        $("login-msg").textContent = "Ce compte n'est pas autorisé.";
+        $("login-msg").classList.remove("hidden");
+      }
+      $("login-view").classList.toggle("hidden", !!ok);
+      $("admin-view").classList.toggle("hidden", !ok);
+      $("logout").classList.toggle("hidden", !ok);
+      if (ok) { resetForm(); load(); }
+    });
+
+    /* ---------- Liste ---------- */
+    async function load() {
+      try {
+        const snap = await getDocs(collection(db, "travaux"));
+        items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        items.sort((a, b) => (toDate(b.date) || 0) - (toDate(a.date) || 0));
+        renderList();
+      } catch (err) {
+        console.error(err);
+        flash("Impossible de charger les publications : " + (err.code || err.message), true);
+      }
+    }
+
+    function renderList() {
+      $("total").textContent = items.length + (items.length > 1 ? " publications" : " publication");
+      if (!items.length) {
+        $("list").innerHTML = '<p style="color:var(--muted)">Aucune publication pour le moment.</p>';
+        return;
+      }
+      $("list").innerHTML = items.map(w => `
+        <div class="item">
+          <div>
+            <h3>${esc(w.title || "(sans titre)")}<span class="badge ${w.published ? "pub" : ""}">${w.published ? "Publié" : "Brouillon"}</span></h3>
+            <div class="sub">${esc(w.category || "sans catégorie")} · ${fmt(toDate(w.date))}</div>
+          </div>
+          <div class="actions-mini">
+            <a class="mini" href="../travaux/article.html?id=${encodeURIComponent(w.id)}" target="_blank" rel="noopener">Voir</a>
+            <button class="mini" data-act="edit" data-id="${esc(w.id)}">Modifier</button>
+            <button class="mini" data-act="toggle" data-id="${esc(w.id)}">${w.published ? "Dépublier" : "Publier"}</button>
+            <button class="mini del" data-act="del" data-id="${esc(w.id)}">Supprimer</button>
+          </div>
+        </div>`).join("");
+    }
+
+    $("list").addEventListener("click", async (e) => {
+      const b = e.target.closest("button[data-act]");
+      if (!b) return;
+      const w = items.find(x => x.id === b.dataset.id);
+      if (!w) return;
+
+      if (b.dataset.act === "edit") {
+        editId = w.id;
+        $("form-title").textContent = "Modifier la publication";
+        $("f-title").value = w.title || "";
+        $("f-cat").value = w.category || "";
+        $("f-date").value = toInput(toDate(w.date));
+        $("f-excerpt").value = w.excerpt || "";
+        $("f-content").value = w.content || "";
+        $("f-pdf").value = w.pdfUrl || "";
+        $("f-pub").checked = !!w.published;
+        $("count").textContent = $("f-excerpt").value.length;
+        $("form-panel").scrollIntoView({ behavior: "smooth" });
+      }
+
+      if (b.dataset.act === "toggle") {
+        try {
+          await setDoc(doc(db, "travaux", w.id), { published: !w.published }, { merge: true });
+          flash(w.published ? "Publication retirée du site." : "Publication mise en ligne.");
+          load();
+        } catch (err) { flash("Échec : " + (err.code || err.message), true); }
+      }
+
+      if (b.dataset.act === "del") {
+        if (!confirm("Supprimer définitivement « " + (w.title || "sans titre") + " » ?")) return;
+        try {
+          await deleteDoc(doc(db, "travaux", w.id));
+          if (editId === w.id) resetForm();
+          flash("Publication supprimée.");
+          load();
+        } catch (err) { flash("Échec : " + (err.code || err.message), true); }
+      }
+    });
+
+    /* ---------- Formulaire ---------- */
+    function resetForm() {
+      editId = null;
+      $("work-form").reset();
+      $("f-date").value = toInput(new Date());
+      $("form-title").textContent = "Nouvelle publication";
+      $("count").textContent = "0";
+    }
+
+    $("reset").addEventListener("click", resetForm);
+    $("f-excerpt").addEventListener("input", (e) => { $("count").textContent = e.target.value.length; });
+
+    $("work-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        title: $("f-title").value.trim(),
+        category: $("f-cat").value,
+        excerpt: $("f-excerpt").value.trim(),
+        content: $("f-content").value,
+        pdfUrl: $("f-pdf").value.trim(),
+        published: $("f-pub").checked,
+        date: Timestamp.fromDate(new Date($("f-date").value + "T12:00:00"))
+      };
+      if (!data.title || !data.category || !data.excerpt) { flash("Titre, catégorie et résumé sont obligatoires.", true); return; }
+
+      const btn = $("save");
+      btn.disabled = true;
+      try {
+        if (editId) await setDoc(doc(db, "travaux", editId), data, { merge: true });
+        else await addDoc(collection(db, "travaux"), data);
+        flash(data.published ? "Enregistré et publié sur le site." : "Enregistré en brouillon.");
+        resetForm();
+        load();
+      } catch (err) {
+        console.error(err);
+        flash("Échec de l'enregistrement : " + (err.code || err.message), true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
