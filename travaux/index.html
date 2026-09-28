@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travaux — Stella Yathe</title>
+  <meta name="description" content="Analyses d'entreprises, concepts financiers, rapports annuels et lectures de transactions M&A.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="wrap">
+      <a href="../index.html" class="brand">Stella <span>Yathe</span></a>
+      <nav>
+        <ul>
+          <li><a href="../index.html">Accueil</a></li>
+          <li><a href="index.html" class="active">Travaux</a></li>
+          <li><a href="../cv/index.html">CV &amp; Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- EN-TÊTE -->
+  <section class="page-head">
+    <div class="wrap">
+      <span class="eyebrow">Travaux</span>
+      <h1>Analyses &amp; recherches</h1>
+      <p>Chaque étude d'une entreprise ou d'une notion donne lieu à une publication : méthode, chiffres, conclusion.</p>
+    </div>
+  </section>
+
+  <!-- LISTE -->
+  <section class="block">
+    <div class="wrap">
+
+      <div class="filters" id="filters">
+        <button class="chip on" data-cat="all">Tout</button>
+        <button class="chip" data-cat="Analyse d'entreprise">Analyses d'entreprises</button>
+        <button class="chip" data-cat="Concept financier">Concepts financiers</button>
+        <button class="chip" data-cat="Rapport annuel">Rapports annuels</button>
+        <button class="chip" data-cat="Transaction M&A">Transactions / M&amp;A</button>
+      </div>
+
+      <!-- Rempli par main.js depuis Firestore ; contenu de repli ci-dessous -->
+      <div class="grid" id="works">
+        <a class="card" href="#" data-cat="Analyse d'entreprise">
+          <div class="meta"><b>Analyse d'entreprise</b><span>En cours</span></div>
+          <h3>Eiffage : analyse financière complète</h3>
+          <p>Secteur, stratégie, comptes, valorisation par DCF et multiples, synthèse SWOT.</p>
+          <span class="more">Bientôt disponible →</span>
+        </a>
+      </div>
+
+      <p id="empty" style="display:none;color:var(--muted);margin-top:24px">Aucune publication dans cette catégorie pour le moment.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap">
+      <span>© 2026 Stella Yathe</span>
+      <span>Finance d'entreprise · Audit · M&amp;A</span>
+    </div>
+  </footer>
+
+  <!-- Filtre par catégorie (fonctionne aussi sur les cartes chargées dynamiquement) -->
+  <script>
+    document.getElementById('filters').addEventListener('click', function (e) {
+      var chip = e.target.closest('.chip');
+      if (!chip) return;
+      document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+      chip.classList.add('on');
+      var cat = chip.dataset.cat, shown = 0;
+      document.querySelectorAll('#works .card').forEach(function (card) {
+        var ok = cat === 'all' || card.dataset.cat === cat;
+        card.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      });
+      document.getElementById('empty').style.display = shown ? 'none' : 'block';
+    });
+  </script>
+  <script type="module" src="../assets/js/main.js"></script>
+</body>
+</html>
