@@ -35,11 +35,12 @@
     .actions-mini{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
     .mini{padding:8px 14px;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);background:transparent;cursor:pointer;color:var(--navy);font-family:var(--sans);transition:.2s}
     .mini:hover{background:var(--navy);color:var(--ivory);border-color:var(--navy)}
-    .mini.del:hover{background:#a33;border-color:#a33}
+    .mini.del:hover{background:#a33;border-color:#a33;color:#fff}
+    .docrow{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-bottom:10px;align-items:center}
     .top-right{display:flex;gap:18px;align-items:center}
     .top-right a,.top-right button{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(246,243,236,.75);background:none;border:none;cursor:pointer;font-family:var(--sans)}
     .top-right a:hover,.top-right button:hover{color:var(--brass)}
-    @media(max-width:700px){.row{grid-template-columns:1fr}.item{grid-template-columns:1fr}.actions-mini{justify-content:flex-start}.panel{padding:26px 20px}}
+    @media(max-width:700px){.row,.docrow{grid-template-columns:1fr}.item{grid-template-columns:1fr}.actions-mini{justify-content:flex-start}.panel{padding:26px 20px}}
   </style>
 </head>
 <body>
@@ -80,7 +81,6 @@
 
         <div id="msg" class="msg hidden"></div>
 
-        <!-- FORMULAIRE -->
         <div class="panel" id="form-panel">
           <h2 id="form-title">Nouvelle publication</h2>
           <form id="work-form">
@@ -122,9 +122,12 @@
             </div>
 
             <div class="field">
-              <label for="f-pdf">Lien du PDF (facultatif)</label>
-              <input type="text" id="f-pdf" placeholder="../travaux/pdf/eiffage.pdf">
-              <div class="hint">Dépose d'abord le PDF dans le dossier <code>travaux/pdf/</code> du dépôt GitHub.</div>
+              <label>Documents à télécharger (facultatif)</label>
+              <div id="docs"></div>
+              <button type="button" class="mini" id="add-doc">+ Ajouter un document</button>
+              <div class="hint">
+                PDF, Excel, PowerPoint, Word… Dépose d'abord le fichier dans le dossier <code>travaux/files/</code> du dépôt GitHub, puis indique ici son nom exact, par exemple <code>eiffage-dcf.xlsx</code>. Le nom affiché est facultatif.
+              </div>
             </div>
 
             <label class="check"><input type="checkbox" id="f-pub"> Publié (visible par tout le monde sur le site)</label>
@@ -136,10 +139,9 @@
           </form>
         </div>
 
-        <!-- LISTE -->
         <div class="list-head">
           <h2 style="font-size:1.8rem">Mes publications</h2>
-          <span class="sub" id="total" style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)"></span>
+          <span id="total" style="font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)"></span>
         </div>
         <div id="list"></div>
       </div>
@@ -162,6 +164,7 @@
       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const ADMIN_EMAIL = "stellayathe@gmail.com";
+    const FILES_PREFIX = "../travaux/files/";
     const $ = (id) => document.getElementById(id);
     const esc = (s = "") => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 
@@ -174,6 +177,10 @@
     const toInput = (d) => d && !isNaN(d) ? `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` : "";
     const fmt = (d) => d && !isNaN(d) ? d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }) : "sans date";
 
+    // "eiffage-dcf.xlsx" -> "../travaux/files/eiffage-dcf.xlsx" ; un chemin ou un lien complet est conservé
+    const normUrl = (u) => { u = u.trim(); if (!u) return ""; return (/^https?:\/\//i.test(u) || u.includes("/")) ? u : FILES_PREFIX + u; };
+    const showUrl = (u = "") => u.startsWith(FILES_PREFIX) ? u.slice(FILES_PREFIX.length) : u;
+
     function flash(text, isErr = false) {
       const m = $("msg");
       m.textContent = text;
@@ -181,6 +188,30 @@
       m.classList.remove("hidden");
       clearTimeout(flash.t);
       flash.t = setTimeout(() => m.classList.add("hidden"), 5000);
+    }
+
+    /* ---------- Documents (lignes dynamiques) ---------- */
+    function addDocRow(label = "", url = "") {
+      const row = document.createElement("div");
+      row.className = "docrow";
+      row.innerHTML =
+        `<input type="text" class="d-label" placeholder="Nom affiché (ex. Modèle DCF)" value="${esc(label)}">` +
+        `<input type="text" class="d-url" placeholder="nom-du-fichier.xlsx" value="${esc(showUrl(url))}">` +
+        `<button type="button" class="mini del d-rm">Retirer</button>`;
+      $("docs").appendChild(row);
+    }
+    $("add-doc").addEventListener("click", () => addDocRow());
+    $("docs").addEventListener("click", (e) => { if (e.target.classList.contains("d-rm")) e.target.closest(".docrow").remove(); });
+
+    function collectDocs() {
+      const out = [];
+      document.querySelectorAll("#docs .docrow").forEach(r => {
+        const url = normUrl(r.querySelector(".d-url").value);
+        if (!url) return;
+        const label = r.querySelector(".d-label").value.trim() || decodeURIComponent(url.split("/").pop());
+        out.push({ label, url });
+      });
+      return out;
     }
 
     /* ---------- Connexion ---------- */
@@ -231,17 +262,24 @@
       }
     }
 
+    function docsOf(w) {
+      if (Array.isArray(w.files) && w.files.length) return w.files;
+      return w.pdfUrl ? [{ label: "PDF", url: w.pdfUrl }] : []; // anciennes publications
+    }
+
     function renderList() {
       $("total").textContent = items.length + (items.length > 1 ? " publications" : " publication");
       if (!items.length) {
         $("list").innerHTML = '<p style="color:var(--muted)">Aucune publication pour le moment.</p>';
         return;
       }
-      $("list").innerHTML = items.map(w => `
+      $("list").innerHTML = items.map(w => {
+        const n = docsOf(w).length;
+        return `
         <div class="item">
           <div>
             <h3>${esc(w.title || "(sans titre)")}<span class="badge ${w.published ? "pub" : ""}">${w.published ? "Publié" : "Brouillon"}</span></h3>
-            <div class="sub">${esc(w.category || "sans catégorie")} · ${fmt(toDate(w.date))}</div>
+            <div class="sub">${esc(w.category || "sans catégorie")} · ${fmt(toDate(w.date))}${n ? " · " + n + " document" + (n > 1 ? "s" : "") : ""}</div>
           </div>
           <div class="actions-mini">
             <a class="mini" href="../travaux/article.html?id=${encodeURIComponent(w.id)}" target="_blank" rel="noopener">Voir</a>
@@ -249,7 +287,8 @@
             <button class="mini" data-act="toggle" data-id="${esc(w.id)}">${w.published ? "Dépublier" : "Publier"}</button>
             <button class="mini del" data-act="del" data-id="${esc(w.id)}">Supprimer</button>
           </div>
-        </div>`).join("");
+        </div>`;
+      }).join("");
     }
 
     $("list").addEventListener("click", async (e) => {
@@ -266,9 +305,10 @@
         $("f-date").value = toInput(toDate(w.date));
         $("f-excerpt").value = w.excerpt || "";
         $("f-content").value = w.content || "";
-        $("f-pdf").value = w.pdfUrl || "";
         $("f-pub").checked = !!w.published;
         $("count").textContent = $("f-excerpt").value.length;
+        $("docs").innerHTML = "";
+        docsOf(w).forEach(f => addDocRow(f.label, f.url));
         $("form-panel").scrollIntoView({ behavior: "smooth" });
       }
 
@@ -295,6 +335,7 @@
     function resetForm() {
       editId = null;
       $("work-form").reset();
+      $("docs").innerHTML = "";
       $("f-date").value = toInput(new Date());
       $("form-title").textContent = "Nouvelle publication";
       $("count").textContent = "0";
@@ -310,7 +351,8 @@
         category: $("f-cat").value,
         excerpt: $("f-excerpt").value.trim(),
         content: $("f-content").value,
-        pdfUrl: $("f-pdf").value.trim(),
+        files: collectDocs(),
+        pdfUrl: "", // remplacé par la liste de documents
         published: $("f-pub").checked,
         date: Timestamp.fromDate(new Date($("f-date").value + "T12:00:00"))
       };
