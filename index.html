@@ -1,111 +1,107 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stella Yathe — Corporate Finance</title>
-<meta name="description" content="Portfolio de Stella Yathe, étudiante en Corporate Finance à ICN Business School — analyses d'entreprises, concepts de finance, veille M&A et Private Equity.">
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stella Yathe — Finance d'entreprise</title>
+  <meta name="description" content="Portfolio de Stella Yathe, étudiante en Corporate Finance à ICN Business School : analyses d'entreprises, valorisation, audit et contrôle de gestion.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body data-page="index.html">
+<body>
 
-<header id="site-header" class="site-header"></header>
-
-<main>
-
-  <section style="padding-top:88px; padding-bottom:88px;">
+  <!-- NAV -->
+  <header class="nav">
     <div class="wrap">
-      <p class="eyebrow">ÉTUDIANTE — PROGRAMME GRANDE ÉCOLE, ICN BUSINESS SCHOOL · SPÉCIALISATION CORPORATE FINANCE</p>
-      <h1 style="margin-top: 18px; max-width: 14ch;">Stella Yathe</h1>
-      <p class="lede" style="margin-top: 24px; max-width: 42ch;">
-        Je construis, analyse par analyse, une expertise en finance d'entreprise et en finance transactionnelle — en vue de l'audit, des transaction services et, à terme, du M&A et du private equity.
-      </p>
-      <div class="row" style="margin-top: 34px;">
-        <a href="travaux.html" class="btn">Voir mes travaux</a>
-        <a href="cv.html" class="btn btn-ghost">Consulter mon CV</a>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap" style="display:grid; grid-template-columns: 1.3fr 1fr; gap: 56px;">
-      <div>
-        <p class="eyebrow">TRAJECTOIRE</p>
-        <h2 style="margin-top:14px;">Vers l'audit, les transaction services et le corporate finance</h2>
-        <p style="margin-top:22px; color: var(--slate);">
-          En alternance en contrôle de gestion depuis septembre 2025, je ne compte pas m'y arrêter. Mon objectif est de rejoindre un cabinet d'audit ou une équipe transaction services, avant de m'orienter vers le M&A ou le private equity. Ce site documente ce chemin : ce que j'apprends, ce que j'analyse, et à quel rythme je progresse.
-        </p>
-        <p style="margin-top:16px; color: var(--slate);">
-          Prochaine étape académique visée&nbsp;: le master Dauphine&nbsp;225, Finance d'Entreprise et Ingénierie Financière.
-        </p>
-      </div>
-      <div style="border-left: 1px solid var(--line); padding-left: 32px;">
-        <p class="eyebrow">EN CE MOMENT</p>
-        <ul style="list-style:none; padding:0; margin: 18px 0 0; color: var(--slate); font-size: 0.95rem; display:flex; flex-direction:column; gap:10px;">
-          <li>— Lecture du Vernimmen</li>
-          <li>— Analyse de bilan et lecture des états financiers</li>
-          <li>— Analyse de rapports annuels</li>
-          <li>— Comptabilité financière</li>
-          <li>— Bases de la valorisation</li>
-          <li>— Fondamentaux M&A et private equity</li>
+      <a href="index.html" class="brand">Stella <span>Yathe</span></a>
+      <nav>
+        <ul>
+          <li><a href="index.html" class="active">Accueil</a></li>
+          <li><a href="travaux/index.html">Travaux</a></li>
+          <li><a href="cv/index.html">CV &amp; Contact</a></li>
         </ul>
-      </div>
+      </nav>
     </div>
-  </section>
+  </header>
 
-  <section>
+  <!-- HERO -->
+  <section class="hero">
     <div class="wrap">
-      <div class="space-between">
-        <div>
-          <p class="eyebrow">TRAVAUX RÉCENTS</p>
-          <h2 style="margin-top:14px;">Dernières publications</h2>
-        </div>
-        <a href="travaux.html" class="btn btn-ghost">Tout voir</a>
-      </div>
-
-      <div class="card-grid" id="recent-list" style="margin-top:36px;">
-        <p class="skeleton" style="padding:30px;">Chargement…</p>
+      <span class="eyebrow">Finance d'entreprise · ICN Business School</span>
+      <h1>Comprendre la <em>création de valeur</em>.</h1>
+      <p class="lead">
+        Étudiante en dernière année de Programme Grande École, spécialisée en Corporate Finance.
+        Audit interne, contrôle de gestion, analyse financière : ce site rassemble mes analyses et mes travaux.
+      </p>
+      <div class="actions">
+        <a href="travaux/index.html" class="btn btn-solid">Voir mes travaux</a>
+        <a href="cv/index.html" class="btn btn-line">CV &amp; Contact</a>
       </div>
     </div>
   </section>
 
-</main>
-
-<footer id="site-footer" class="site-footer"></footer>
-
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
-<script src="js/firebase-init.js"></script>
-<script src="js/data.js"></script>
-<script src="js/render.js"></script>
-<script>
-async function loadRecent() {
-  const list = document.getElementById("recent-list");
-  try {
-    const items = (await getTravaux()).slice(0, 3);
-    if (items.length === 0) {
-      list.innerHTML = '<p class="empty-state" style="padding:30px;">Aucun travail publié pour le moment.</p>';
-      return;
-    }
-    list.innerHTML = items.map(item => `
-      <a class="work-card" href="travail.html?id=${item.id}">
-        <div class="space-between">
-          <span class="tag">${CATEGORIES[item.category] || item.category}</span>
-          <span class="meta">${formatDate(item.date)}</span>
+  <!-- SUR CE SITE -->
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Sur ce site</span>
+          <h2>Trois entrées, l'essentiel.</h2>
         </div>
-        <h3>${item.title}</h3>
-        <p class="work-excerpt">${item.excerpt || ""}</p>
-        <span class="read-link">Lire l'article <span class="arrow">→</span></span>
-      </a>
-    `).join("");
-  } catch (e) {
-    list.innerHTML = '<p class="empty-state" style="padding:30px;">Impossible de charger les travaux pour le moment.</p>';
-    console.error(e);
-  }
-}
-loadRecent();
-</script>
+      </div>
+      <div class="doors">
+        <a class="door" href="travaux/index.html">
+          <span class="num">01</span>
+          <h3>Travaux</h3>
+          <p>Analyses d'entreprises, valorisation, concepts financiers et lectures de transactions.</p>
+        </a>
+        <a class="door" href="cv/index.html#parcours">
+          <span class="num">02</span>
+          <h3>Parcours</h3>
+          <p>Formation, expériences en entreprise et bibliothèque de référence.</p>
+        </a>
+        <a class="door" href="cv/index.html#contact">
+          <span class="num">03</span>
+          <h3>Contact</h3>
+          <p>CV à télécharger, LinkedIn, e-mail et téléphone.</p>
+        </a>
+      </div>
+    </div>
+  </section>
 
+  <!-- DERNIERS TRAVAUX -->
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">À la une</span>
+          <h2>Derniers travaux</h2>
+        </div>
+        <a href="travaux/index.html" class="link-arrow">Tout voir →</a>
+      </div>
+
+      <!-- Rempli par main.js depuis Firestore ; contenu de repli ci-dessous -->
+      <div class="grid" id="latest">
+        <a class="card" href="travaux/index.html">
+          <div class="meta"><b>Analyse d'entreprise</b><span>En cours</span></div>
+          <h3>Eiffage : analyse financière complète</h3>
+          <p>Secteur, stratégie, comptes, valorisation par DCF et multiples, synthèse SWOT.</p>
+          <span class="more">Bientôt disponible →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap">
+      <span>© 2026 Stella Yathe</span>
+      <span>Finance d'entreprise · Audit · M&amp;A</span>
+    </div>
+  </footer>
+
+  <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
