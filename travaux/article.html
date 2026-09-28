@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Travaux — Stella Yathe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="wrap">
+      <a href="../index.html" class="brand">Stella <span>YATHE</span></a>
+      <nav>
+        <ul>
+          <li><a href="../index.html">Accueil</a></li>
+          <li><a href="../projet/index.html">Projet</a></li>
+          <li><a href="index.html" class="active">Travaux</a></li>
+          <li><a href="../cv/index.html">CV &amp; Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- EN-TÊTE (rempli par le script) -->
+  <section class="page-head">
+    <div class="wrap">
+      <div class="article-meta"><span id="a-cat">Travaux</span><span id="a-date"></span></div>
+      <h1 id="a-title" style="margin-top:16px">Chargement…</h1>
+      <p id="a-excerpt"></p>
+    </div>
+  </section>
+
+  <!-- CORPS -->
+  <section class="block">
+    <div class="wrap">
+      <article class="prose" id="a-body"></article>
+
+      <div class="article-actions">
+        <a href="index.html" class="link-arrow">← Tous les travaux</a>
+        <a href="#" id="a-pdf" class="btn btn-dark" style="display:none" target="_blank" rel="noopener">Télécharger l'analyse (PDF)</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap">
+      <span>© 2026 Stella Yathe</span>
+      <span>Finance d'entreprise · Audit · M&amp;A</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { db } from "../assets/js/firebase-config.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s = "") => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+    // Mise en forme légère : **gras**, *italique*, [texte](https://lien), ![alt](image)
+    function inline(s) {
+      return esc(s)
+        .replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+|[^)\s:]+)\)/g, '<img src="$2" alt="$1">')
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>");
+    }
+
+    // ## Titre · ### Sous-titre · - puce · > citation · ligne vide = nouveau paragraphe
+    function render(text) {
+      let html = "", inList = false, para = [];
+      const flushP = () => { if (para.length) { html += "<p>" + inline(para.join(" ")) + "</p>"; para = []; } };
+      const closeL = () => { if (inList) { html += "</ul>"; inList = false; } };
+      for (const raw of String(text).replace(/\r/g, "").split("\n")) {
+        const l = raw.trim();
+        if (!l) { flushP(); closeL(); continue; }
+        if (l.startsWith("### "))      { flushP(); closeL(); html += "<h3>" + inline(l.slice(4)) + "</h3>"; }
+        else if (l.startsWith("## "))  { flushP(); closeL(); html += "<h2>" + inline(l.slice(3)) + "</h2>"; }
+        else if (l.startsWith("> "))   { flushP(); closeL(); html += "<blockquote>" + inline(l.slice(2)) + "</blockquote>"; }
+        else if (/^!\[/.test(l))       { flushP(); closeL(); html += inline(l); }
+        else if (/^[-•] /.test(l))     { flushP(); if (!inList) { html += "<ul>"; inList = true; } html += "<li>" + inline(l.slice(2)) + "</li>"; }
+        else                           { closeL(); para.push(l); }
+      }
+      flushP(); closeL();
+      return html;
+    }
+
+    const notFound = () => {
+      $("a-title").textContent = "Publication introuvable";
+      $("a-excerpt").textContent = "Cette publication n'existe pas ou n'est pas encore disponible.";
+      $("a-cat").textContent = "Travaux";
+    };
+
+    (async () => {
+      const id = new URLSearchParams(location.search).get("id");
+      if (!id) return notFound();
+      try {
+        const snap = await getDoc(doc(db, "travaux", id));
+        if (!snap.exists()) return notFound();
+        const w = snap.data();
+
+        document.title = (w.title || "Travaux") + " — Stella Yathe";
+        $("a-cat").textContent = w.category || "Travaux";
+        const d = w.date?.toDate ? w.date.toDate() : (w.date ? new Date(w.date) : null);
+        $("a-date").textContent = d && !isNaN(d) ? d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "";
+        $("a-title").textContent = w.title || "";
+        $("a-excerpt").textContent = w.excerpt || "";
+        $("a-body").innerHTML = render(w.content || "");
+
+        if (w.pdfUrl) { const a = $("a-pdf"); a.href = w.pdfUrl; a.style.display = ""; }
+      } catch (e) {
+        console.warn(e);
+        notFound();
+      }
+    })();
+  </script>
+</body>
+</html>
