@@ -134,7 +134,7 @@
 
             <div class="btns">
               <button class="btn btn-solid" type="submit" id="save">Enregistrer</button>
-              <button class="btn btn-dark" type="button" id="reset">Annuler / Nouveau</button>
+              <button class="btn btn-dark" type="button" id="btn-reset">Annuler / Nouveau</button>
             </div>
           </form>
         </div>
@@ -341,7 +341,7 @@
       $("count").textContent = "0";
     }
 
-    $("reset").addEventListener("click", resetForm);
+    $("btn-reset").addEventListener("click", resetForm);
     $("f-excerpt").addEventListener("input", (e) => { $("count").textContent = e.target.value.length; });
 
     $("work-form").addEventListener("submit", async (e) => {
