@@ -207,3 +207,9 @@ section.block{padding:96px 0}
 .prose img{margin:28px 0;border:1px solid var(--line)}
 .prose blockquote{border-left:2px solid var(--brass);padding-left:22px;margin:28px 0;color:var(--muted);font-family:var(--serif);font-size:1.35rem;line-height:1.35}
 .article-actions{max-width:72ch;margin:56px auto 0;padding-top:32px;border-top:1px solid var(--line);display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+
+/* ============ RETOUR EN HAUT ============ */
+.to-top{position:fixed;right:24px;bottom:24px;width:46px;height:46px;background:var(--navy);border:1px solid var(--brass);color:var(--ivory);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(8px);transition:.25s;z-index:60}
+.to-top.show{opacity:1;visibility:visible;transform:translateY(0)}
+.to-top:hover{background:var(--brass);color:var(--navy)}
+.to-top svg{width:18px;height:18px}
