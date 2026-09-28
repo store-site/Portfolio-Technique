@@ -62,3 +62,17 @@ async function loadWorks() {
 }
 
 loadWorks();
+
+// ============ RETOUR EN HAUT ============
+(function toTop() {
+  const btn = document.createElement("button");
+  btn.className = "to-top";
+  btn.setAttribute("aria-label", "Retour en haut");
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  document.body.appendChild(btn);
+
+  window.addEventListener("scroll", () => {
+    btn.classList.toggle("show", window.scrollY > 500);
+  });
+  btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+})();
